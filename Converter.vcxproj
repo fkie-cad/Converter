@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1668a263-a377-489f-a79a-01a117e47fea}</ProjectGuid>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <ReadOnlyProject>true</ReadOnlyProject>
+  </PropertyGroup>
+  
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  
+  <PropertyGroup Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <TargetPlatform>Desktop</TargetPlatform>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='Release'">
+    <UseDebugLibraries>False</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='Debug'">
+    <UseDebugLibraries>True</UseDebugLibraries>
+  </PropertyGroup>
+  
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  
+  <PropertyGroup>
+    <OutDir>build\$(Configuration)\$(Platform)</OutDir>
+  </PropertyGroup>
+  
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ItemGroup Label="WrappedTaskItems" />
+  
+  <PropertyGroup>
+    <TargetName>$(SubProj)</TargetName>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>build\64\$(TargetName)\</IntDir>
+    <OutDir>build\64\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>build\debug\64\$(TargetName)\</IntDir>
+    <OutDir>build\debug\64\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>build\32\$(TargetName)\</IntDir>
+    <OutDir>build\32\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>build\debug\32\$(TargetName)\</IntDir>
+    <OutDir>build\debug\32\</OutDir>
+  </PropertyGroup>
+  
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalOptions>/GUARD:cf %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>%(AdditionalDependencies);ntdll.lib;</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <EnablePREfast>true</EnablePREfast>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DDK_INC_PATH);</AdditionalIncludeDirectories>
+      <ExceptionHandling></ExceptionHandling>
+      <PrecompiledHeader></PrecompiledHeader>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks> <!-- /RTC -->
+      <!--<FunctionLevelLinking>true</FunctionLevelLinking>-->
+      <!--<IntrinsicFunctions>true</IntrinsicFunctions>-->
+      <!--<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>-->
+      <!--<LanguageStandard>c99</LanguageStandard>-->
+      <AdditionalOptions>/GS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DDK_INC_PATH);</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DDK_INC_PATH);</AdditionalIncludeDirectories>
+    </Midl>
+  </ItemDefinitionGroup>
+  
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  
+  <ItemDefinitionGroup Condition="'$(RunTimeLib)'=='Release'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(RunTimeLib)'=='Debug'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  
+  <ItemDefinitionGroup Condition="'$(PDB)'!='1'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalOptions>/NOCOFFGRPINFO %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(DebugPrint)'!='0' And '$(DebugPrint)'!=''">
+    <ClCompile>
+      <PreprocessorDefinitions>DEBUG_PRINT=$(DebugPrint);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(ErrorPrint)'=='1'">
+    <ClCompile>
+      <PreprocessorDefinitions>ERROR_PRINT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  
+  <ItemGroup Condition="'$(SubProj)'=='CtlCode' Or '$(SubProj)'==''">
+    <ClCompile Include="src\ctlCode.c" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SubProj)'=='Num2Bin' Or '$(SubProj)'==''">
+    <ClCompile Include="src\num2bin.c" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SubProj)'=='NtStatusToDosError' Or '$(SubProj)'==''">
+    <ClCompile Include="src\NtStatusToDosError.c" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SubProj)'=='String2Hex' Or '$(SubProj)'==''">
+    <ClCompile Include="src\string2Hex.c" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+    
+  <Target Name="DisplayMessages" AfterTargets="Build">
+    <Message Text="PlatformToolset = $(PlatformToolset)" />
+    <Message Text="Project Name = $(MSBuildProjectName)" />
+    <Message Text="Project File Name = $(MSBuildProjectFile)" />
+    <Message Text="ConfigurationType = $(ConfigurationType)" />
+    <Message Text="Configuration = $(Configuration)" />
+    <Message Text="Platform = $(Platform)" />
+    <Message Text="IntDir = $(IntDir)" />
+    <Message Text="OutDir = $(OutDir)" />
+    <Message Text="TargetPath = $(TargetPath)" />
+    <Message Text="DebugPrint = $(DebugPrint)" />
+    <Message Text="ErrorPrint = $(ErrorPrint)" />
+  </Target>
+</Project>
