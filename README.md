@@ -50,8 +50,8 @@ Converts a given number into binary format or a binary string to hex and decimal
 Highlights selected bits.
 
 ### version
-1.0.2  
-Last changed: 24.01.2024
+1.0.3  
+Last changed: 11.04.2024
 
 ### build
 ```bash

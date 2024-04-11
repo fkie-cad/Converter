@@ -16,8 +16,8 @@
 
 
 #define EXE_NAME "Num2Bin"
-#define EXE_VS "1.0.2"
-#define EXE_LC "24.01.2024"
+#define EXE_VS "1.0.3"
+#define EXE_LC "11.04.2024"
 
 
 #define WIDTH_INT8    (0x8)
@@ -50,11 +50,12 @@ typedef struct _CMD_PARAMS {
     } Flags;
 } CMD_PARAMS, *PCMD_PARAMS;
 
-int num2bin(
-    PCMD_PARAMS Params
+int bin2num(
+    PCMD_PARAMS Params,
+    uint64_t* Value
 );
 
-int bin2num(
+int num2bin(
     PCMD_PARAMS Params
 );
 
@@ -108,20 +109,23 @@ int main(int argc, char** argv)
         printUsage();
         goto clean;
     }
+    
+    
+    if ( params.Flags.BinarySet )
+    {
+        s = bin2num(&params, &params.Value);
+        params.Flags.NumberSet = 1;
+    }
 
     if ( params.Flags.NumberSet )
     {
         num2bin(&params);
     }
-    else if ( params.Flags.BinarySet )
-    {
-        bin2num(&params);
-    }
     
     
 clean:
     
-    return 0;
+    return s;
 }
 
 int num2bin(
@@ -172,6 +176,45 @@ int num2bin(
             SetConsoleTextAttribute(hStdout, wOldColorAttrs);
 #endif
     }
+
+    return s;
+}
+
+int bin2num(
+    PCMD_PARAMS Params,
+    uint64_t* Value
+)
+{
+    int s = 0;
+    size_t cb = strlen(Params->BinaryValue);
+    uint64_t value = 0;
+    *Value = 0;
+
+    FPrint();
+
+    // rough check of binary string size
+    if ( !cb || cb > 64 )
+        return ERROR_INVALID_PARAMETER;
+    
+    // check values in binary string for 0 and 1
+    for ( int i = 0; i < (int)cb; i++ )
+    {
+        if ( Params->BinaryValue[i] != '0' && Params->BinaryValue[i] != '1' )
+        {
+            s = ERROR_INVALID_PARAMETER;
+            EPrint("Not a binary string number! (0x%x)\n", s);
+            return s;
+        }
+    }
+
+    // convert string to int
+    for ( int i = 0; i < (int)cb; i++ )
+    {
+        if ( Params->BinaryValue[i] == '1' )
+            value |= (uint64_t)1 << (cb - i - 1);
+    }
+
+    *Value = value;
 
     return s;
 }
@@ -304,56 +347,6 @@ uint64_t getHighlightMask(
 
 clean:
     return highlights;
-}
-
-int bin2num(
-    PCMD_PARAMS Params
-)
-{
-    int s = 0;
-    size_t cb = strlen(Params->BinaryValue);
-    int p = 0;
-    uint64_t value = 0;
-    FPrint();
-
-    if ( !cb || cb > 64 )
-        return ERROR_INVALID_PARAMETER;
-    
-    for ( int i = 0; i < (int)cb; i++ )
-    {
-        if ( Params->BinaryValue[i] != '0' && Params->BinaryValue[i] != '1' )
-        {
-            s = ERROR_INVALID_PARAMETER;
-            EPrint("Not a binary string number! (0x%x)\n", s);
-            return s;
-        }
-    }
-
-    printf("binary: ");
-    if ( cb % 4 != 0 )
-    {
-        for ( p = 0; p < 4-(int)(cb % 4); p++ )
-            putchar('0');
-    }
-    for ( int i = 0, j=p; i < (int)cb; i++, j++ )
-    {
-        if ( j && j % Params->BlockSize == 0 )
-            putchar(' ');
-        putchar(Params->BinaryValue[i]);
-    }
-    printf("\n");
-
-    // convert string to int
-    for ( int i = 0; i < (int)cb; i++ )
-    {
-        if ( Params->BinaryValue[i] == '1' )
-            value |= (uint64_t)1 << (cb - i - 1);
-    }
-
-    printf("hex: 0x%llx\n", value);
-    printf("decimal: %llu\n", value);
-
-    return s;
 }
 
 void printVersion()
