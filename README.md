@@ -50,8 +50,8 @@ Converts a given number into binary format or a binary string to hex and decimal
 Highlights selected bits.
 
 ### version
-1.0.3  
-Last changed: 11.04.2024
+1.0.4  
+Last changed: 22.04.2024
 
 ### build
 ```bash
@@ -74,6 +74,7 @@ $ Num2Bin.exe -n 13 // convert 13 to binary format
 $ Num2Bin.exe -n 0xd -w 8 -s 2 // convert 13 to binary format just showing 8 bits in 2 bit sized blocks
 $ Num2Bin.exe -x d -m 0,2:4,8:16 // convert 13 to binary, highlighting bit 0, 2 to 4 and 8 to 16
 $ Num2Bin.exe -b 11001101 // convert 11001101 to hex and dec
+$ Num2Bin.exe -b "1100 1101" -m 7:4 // convert 11001101 to hex and dec and highlight bits 4 to 7
 ```
 
 

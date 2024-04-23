@@ -13,19 +13,22 @@
 
 #include "Args.h"
 #include "print.h"
+#include "utils/strings.h"
 
 
 #define EXE_NAME "Num2Bin"
-#define EXE_VS "1.0.3"
-#define EXE_LC "11.04.2024"
+#define EXE_VS "1.0.4"
+#define EXE_LC "22.04.2024"
 
 
 #define WIDTH_INT8    (0x8)
 #define WIDTH_INT16   (0x10)
 #define WIDTH_INT32   (0x20)
-#define WIDTH_INT64   (0x30)
+#define WIDTH_INT64   (0x40)
 
+#define MIN_BLOCK_SIZE (2)
 #define DEF_BLOCK_SIZE (4)
+#define MAX_BLOCK_SIZE (0x40)
 
 #define FLAG_VERBOSE    (0x01)
 
@@ -492,11 +495,18 @@ int checkParams(
     if ( Params->Flags.BinarySet )
     {
         if ( !Params->BinaryValue
-            || !Params->BinaryValue[0]
-            || strlen(Params->BinaryValue) > 64 )
+          || !Params->BinaryValue[0] )
         {
             EPrint("Binary value too small or too big!\n");
             s = -1;
+        }
+        else
+        {
+            s = stripWhiteSpace(Params->BinaryValue);
+            if ( s != 0 )
+            {
+                EPrint("Binary value too small or too big!\n");
+            }
         }
     }
 
@@ -505,15 +515,15 @@ int checkParams(
         DPrint("[i] Invalid width specified! Setting to default!\n");
         Params->Width = ALIGN_UP_BY(Params->Width, DEFAULT_ALIGN);
     }
-    if ( Params->Width > 64 )
+    if ( Params->Width > WIDTH_INT64 )
     {
-        DPrint("[i] Invalid width specified! Setting to default!\n");
-        Params->Width = 64;
+        DPrint("[i] Width too big! Setting to max value (0x%x)!\n", WIDTH_INT64);
+        Params->Width = WIDTH_INT64;
     }
     
-    if ( Params->BlockSize < 2
+    if ( Params->BlockSize < MIN_BLOCK_SIZE
         || (Params->BlockSize & (Params->BlockSize-1)) != 0
-        || Params->BlockSize > 64
+        || Params->BlockSize > MAX_BLOCK_SIZE
         )
     {
         DPrint("[i] Invalid block size specified! Setting to default!\n");
