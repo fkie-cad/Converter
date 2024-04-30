@@ -24,22 +24,47 @@ $devcmd> build [/all]
 
 
 ## CtlCode
-A ctl code converter.
-Converts a given ctl code into it's parts (,DeviceType Function, Method, <Access>), or the parts into a ctl code.
+A ioctl code converter.
+Converts a given ioctl code into its parts (DeviceType, Function, Method, Access), 
+  or the parts into an ioctl code.
 
 ### version
-1.0.0  
-Last changed: 21.04.2023
+1.0.2  
+Last changed: 30.04.2024
 
 ### build
 ```bash
-$devcmd> build /ioctl
+$devcmd> build /ctl
 ```
 
 ### examples
 ```bash
-$ CtlCode.exe 0x10000 // convert ioctl code into parts
-$ CtlCode.exe 0x10 0 0 0 // convert parts (<DeviceType> <Function> <Method> <Access>) into ioctl code.
+# convert ioctl code into parts
+$ CtlCode.exe 0x10000
+ioctl: 0x10000
+
+deviceType: 0x1 (FILE_DEVICE_BEEP)
+function: 0x0
+method: 0x0 (METHOD_BUFFERED)
+access: 0x0 (FILE_ANY_ACCESS)
+
+# convert parts (<DeviceType> <Function> <Method> <Access>) given as ints into ioctl code.
+$ CtlCode.exe 0x10 3 0 2
+deviceType: 0x10 (FILE_DEVICE_MULTI_UNC_PROVIDER)
+function: 0x3
+method: 0x0 (METHOD_BUFFERED)
+access: 0x2 (FILE_WRITE_DATA)
+
+ioctl: 0x10800c
+
+# convert parts (<DeviceType> <Function> <Method> <Access>) given as strings into ioctl code.
+$ CtlCode.exe FILE_DEVICE_UCM 1 METHOD_NEITHER FILE_READ_DATA^|FILE_WRITE_ACCESS
+deviceType: 0x57 (FILE_DEVICE_UCM)
+function: 0x1
+method: 0x3 (METHOD_NEITHER)
+access: 0x3 (FILE_READ_DATA | FILE_WRITE_DATA)
+
+ioctl: 0x57c007
 ```
 
 

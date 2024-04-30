@@ -34,7 +34,7 @@ set /a cmpl[%S2DE%]=0
 set /a cmpl[%S2HX%]=0
 
 :: batch params
-set cmdparams[%IOCTL%]=/ioctl
+set cmdparams[%IOCTL%]=/ctl
 set cmdparams[%N2B%]=/n2b
 set cmdparams[%S2DE%]=/s2dE
 set cmdparams[%S2HX%]=/s2h
@@ -303,7 +303,7 @@ GOTO :ParseParams
     call :usage
     echo.
     echo Targets:
-    echo /ioctl: Build ioctl code converter.
+    echo /ctl: Build ioctl code converter.
     echo /n2b: Number to binary converter.
     echo /s2dE: Build NTSTATUS code to DOS error code converter.
     echo /s2hx: Build string ^<=^> hex converter.
