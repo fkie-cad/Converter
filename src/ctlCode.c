@@ -374,22 +374,14 @@ ULONG accessStringToInt(_In_ PCHAR Access)
             access |= FILE_ANY_ACCESS;
             valid = TRUE;
         }
-        else if ( strcmp(bucket[i], "FILE_READ_DATA") == 0 )
+        else if ( strcmp(bucket[i], "FILE_READ_DATA") == 0 
+               || strcmp(bucket[i], "FILE_READ_ACCESS") == 0 )
         {
             access |= FILE_READ_DATA;
             valid = TRUE;
         }
-        else if ( strcmp(bucket[i], "FILE_READ_ACCESS") == 0 )
-        {
-            access |= FILE_READ_DATA;
-            valid = TRUE;
-        }
-        else if ( strcmp(bucket[i], "FILE_WRITE_DATA") == 0 )
-        {
-            access |= FILE_WRITE_DATA;
-            valid = TRUE;
-        }
-        else if ( strcmp(bucket[i], "FILE_WRITE_ACCESS") == 0 )
+        else if ( strcmp(bucket[i], "FILE_WRITE_DATA") == 0 
+               || strcmp(bucket[i], "FILE_WRITE_ACCESS") == 0 )
         {
             access |= FILE_WRITE_DATA;
             valid = TRUE;
