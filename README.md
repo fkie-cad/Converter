@@ -10,6 +10,7 @@ Various converter tools for daily tasks.
 -  [CtlCode](#ctlcode)
 -  [Num2Bin](#num2bin)
 -  [NtStatus2DosError](#ntstatus2doserror)
+-  [String2Arr](#string2arr)
 -  [String2Hex](#string2hex)
 
 
@@ -123,6 +124,38 @@ $ NtStatus2DosError 0xC0000005
 
 
 
+## String2Arr
+Convert string into array of chars.
+
+### version
+1.0.0  
+Last changed: 21.04.2023
+
+### build
+```bash
+$devcmd> build /s2arr
+```
+
+### Usage
+```
+String2Arr <type> [-k <key>] string...
+```
+
+### Options
+- type: 1: char, 2: wchar, 4: reversed
+- -k: XOR encryption key given as a hex string
+- strings: a set of strings to convert
+
+### examples
+```bash
+$ String2Arr 1 bla // convert bla to char array
+$ String2Arr 5 bla // convert bla to reversed char array
+$ String2Arr 3 bla blub // convert bla and blub to char and wchar array
+$ String2Arr 1 -k 41 bla // convert bla to xored char array and xor with 0x41
+```
+
+
+
 ## String2Hex
 Convert strings into hex or hex into string.
 
@@ -156,6 +189,3 @@ $ String2hex -nu 0x0061006c0042 // uint into unicode => string: Bla, wchars: B l
 
 ## Copyright, Credits & Contact
 Published under [GNU GENERAL PUBLIC LICENSE](LICENSE).
-
-### author
-- Henning Braun ([henning.braun@fkie.fraunhofer.de](henning.braun@fkie.fraunhofer.de)) 

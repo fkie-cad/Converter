@@ -32,7 +32,7 @@
   <PropertyGroup Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
     <TargetPlatform>Desktop</TargetPlatform>
-    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -45,10 +45,6 @@
   
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   
-  <PropertyGroup>
-    <OutDir>build\$(Configuration)\$(Platform)</OutDir>
-  </PropertyGroup>
-  
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
@@ -59,20 +55,19 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>build\64\$(TargetName)\</IntDir>
     <OutDir>build\64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>build\debug\64\$(TargetName)\</IntDir>
     <OutDir>build\debug\64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>build\32\$(TargetName)\</IntDir>
     <OutDir>build\32\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>build\debug\32\$(TargetName)\</IntDir>
     <OutDir>build\debug\32\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntDir>$(OutDir)$(TargetName)\</IntDir>
   </PropertyGroup>
   
   <ItemDefinitionGroup>
@@ -155,6 +150,9 @@
   </ItemGroup>
   <ItemGroup Condition="'$(SubProj)'=='NtStatusToDosError' Or '$(SubProj)'==''">
     <ClCompile Include="src\NtStatusToDosError.c" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SubProj)'=='String2Arr' Or '$(SubProj)'==''">
+    <ClCompile Include="src\string2Array.c" />
   </ItemGroup>
   <ItemGroup Condition="'$(SubProj)'=='String2Hex' Or '$(SubProj)'==''">
     <ClCompile Include="src\string2Hex.c" />

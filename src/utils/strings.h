@@ -45,6 +45,44 @@ int stripWhiteSpace(char* String)
     return 0;
 }
 
+// destructive
+char* strip(char* String)
+{
+    if ( !String )
+        return NULL; // no string
+
+    char* stringPtr = String;
+    char* stringStart = String;
+    
+    if ( *stringPtr == 0 )
+        return String; // string empty
+
+    // lstrip
+    while ( *stringPtr != 0 )
+    {
+        if ( *stringPtr == ' ')
+            stringStart++;
+        else 
+            break;
+
+        stringPtr++;
+    }
+
+    // rstrip
+    while ( *stringPtr != 0 )
+    {
+        if ( *stringPtr == ' ')
+        {
+            *stringPtr = 0;
+            break;
+        }
+
+        stringPtr++;
+    }
+    
+    return stringStart;
+}
+
 /**
  * Split string into its parts, determined by the delimiter.
  * str will be changed!!!

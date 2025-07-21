@@ -16,6 +16,8 @@ set /a IOCTL=%id%
 set /a id+=1
 set /a N2B=%id%
 set /a id+=1
+set /a S2AR=%id%
+set /a id+=1
 set /a S2DE=%id%
 set /a id+=1
 set /a S2HX=%id%
@@ -24,18 +26,21 @@ set /a PROJ_ID_MAX=%id%
 :: project file names
 set projects[%IOCTL%]=CtlCode
 set projects[%N2B%]=Num2Bin
+set projects[%S2AR%]=String2Arr
 set projects[%S2DE%]=NtStatusToDosError
 set projects[%S2HX%]=String2Hex
 
 :: do compile flags
 set /a cmpl[%IOCTL%]=0
 set /a cmpl[%N2B%]=0
+set /a cmpl[%S2AR%]=0
 set /a cmpl[%S2DE%]=0
 set /a cmpl[%S2HX%]=0
 
 :: batch params
 set cmdparams[%IOCTL%]=/ctl
 set cmdparams[%N2B%]=/n2b
+set cmdparams[%S2AR%]=/s2ar
 set cmdparams[%S2DE%]=/s2dE
 set cmdparams[%S2HX%]=/s2h
 
@@ -54,7 +59,7 @@ set /a pdb=0
 set /a debug_print=%EP_FLAG%
 set platform=x64
 ::set pts=WindowsApplicationForDrivers10.0
-set pts=v142
+set pts=v143
 set /a er=3
 set /a rtl=0
 set /a verbose=0
@@ -305,6 +310,7 @@ GOTO :ParseParams
     echo Targets:
     echo /ctl: Build ioctl code converter.
     echo /n2b: Number to binary converter.
+    echo /s2ar: Build string to array converter.
     echo /s2dE: Build NTSTATUS code to DOS error code converter.
     echo /s2hx: Build string ^<=^> hex converter.
     echo.

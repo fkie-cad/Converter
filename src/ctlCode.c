@@ -44,19 +44,19 @@ INT __cdecl main(int argc, char** argv)
         if ( startsWith(argv[1], "FILE_DEVICE_") )
             deviceType = deviceTypeStringToInt(argv[1]);
         else
-            deviceType = strtoul(argv[1], NULL, 0);
+            deviceType = strtoul(argv[1], NULL, 0x10);
 
-        ULONG function = strtoul(argv[2], NULL, 0);
+        ULONG function = strtoul(argv[2], NULL, 0x10);
         
         if ( startsWith(argv[3], "METHOD_") )
             method = methodStringToInt(argv[3]);
         else
-            method = strtoul(argv[3], NULL, 0);
+            method = strtoul(argv[3], NULL, 0x10);
         
         if ( startsWith(argv[4], "FILE_") )
             access = accessStringToInt(argv[4]);
         else
-            access = strtoul(argv[4], NULL, 0);
+            access = strtoul(argv[4], NULL, 0x10);
         ULONG ioctl = CTL_CODE(deviceType, function, method, access);
         
         printf("deviceType: 0x%x (%s)\n", deviceType, getDeviceTypeString(deviceType));
@@ -69,7 +69,7 @@ INT __cdecl main(int argc, char** argv)
     }
     else
     {
-        ULONG ioctl = strtoul(argv[1], NULL, 0);
+        ULONG ioctl = strtoul(argv[1], NULL, 0x10);
      
         // 31             16 15 14 13             2 1 0
         // |  DeviceType   | | Ac| | Function     | |m|
@@ -368,6 +368,7 @@ ULONG accessStringToInt(_In_ PCHAR Access)
     for ( size_t i = 0; i < nr_elem; i++ )
     {
         bucket[i] = strToUC(bucket[i]);
+        bucket[i] = strip(bucket[i]);
 
         if ( strcmp(bucket[i], "FILE_ANY_ACCESS") == 0 )
         {
