@@ -9,6 +9,8 @@
     #include <conio.h>
     #include <io.h>
     #include <windows.h>
+#else
+    #include "errors.h"
 #endif
 
 #include "Args.h"
@@ -54,7 +56,7 @@ typedef struct _CMD_PARAMS {
 } CMD_PARAMS, *PCMD_PARAMS;
 
 int bin2num(
-    PCMD_PARAMS Params,
+    char* BinaryValue,
     uint64_t* Value
 );
 
@@ -116,7 +118,9 @@ int main(int argc, char** argv)
     
     if ( params.Flags.BinarySet )
     {
-        s = bin2num(&params, &params.Value);
+        s = bin2num(params.BinaryValue, &params.Value);
+        if ( s != 0 )
+            goto clean;
         params.Flags.NumberSet = 1;
     }
 
@@ -183,37 +187,46 @@ int num2bin(
     return s;
 }
 
+/**
+ * Convert binary value string to integer.
+ * 
+ * @param BinaryValue char* binary string without whitespace
+ * @param Value uint64_t* Resulting value
+ */
 int bin2num(
-    PCMD_PARAMS Params,
+    char* BinaryValue,
     uint64_t* Value
 )
 {
-    int s = 0;
-    size_t cb = strlen(Params->BinaryValue);
-    uint64_t value = 0;
-    *Value = 0;
-
     FPrint();
+
+    int s = 0;
+    size_t cb = strlen(BinaryValue);
+    uint64_t value = 0;
+    size_t i = 0;
+
+    *Value = 0;
 
     // rough check of binary string size
     if ( !cb || cb > 64 )
         return ERROR_INVALID_PARAMETER;
     
     // check values in binary string for 0 and 1
-    for ( int i = 0; i < (int)cb; i++ )
-    {
-        if ( Params->BinaryValue[i] != '0' && Params->BinaryValue[i] != '1' )
-        {
-            s = ERROR_INVALID_PARAMETER;
-            EPrint("Not a binary string number! (0x%x)\n", s);
-            return s;
-        }
-    }
+
+     for ( i = 0; i < cb; i++ )
+     {
+         if ( BinaryValue[i] != '0' && BinaryValue[i] != '1' )
+         {
+             s = ERROR_INVALID_PARAMETER;
+             EPrint("Not a binary string number! (0x%x)\n", s);
+             return s;
+         }
+     }
 
     // convert string to int
-    for ( int i = 0; i < (int)cb; i++ )
+    for ( i = 0; i < cb; i++ )
     {
-        if ( Params->BinaryValue[i] == '1' )
+        if ( BinaryValue[i] == '1' )
             value |= (uint64_t)1 << (cb - i - 1);
     }
 
@@ -401,10 +414,10 @@ int parseParams(
 
         if ( IS_1C_ARG(arg, 'n') )
         {
-            if ( Params->Flags.BinarySet )
+            if ( Params->Flags.BinarySet || Params->Flags.NumberSet )
             {
                 s = ERROR_INVALID_PARAMETER;
-                EPrint("You've already set a binary string!\n");
+                EPrint("You've already set an input value!\n");
                 break;
             }
 
@@ -415,12 +428,28 @@ int parseParams(
 
             i++;
         }
-        else if ( IS_1C_ARG(arg, 'x') )
+        else if ( IS_1C_ARG(arg, 'd') )
         {
-            if ( Params->Flags.BinarySet )
+            if ( Params->Flags.BinarySet || Params->Flags.NumberSet )
             {
                 s = ERROR_INVALID_PARAMETER;
-                EPrint("You've already set a binary string!\n");
+                EPrint("You've already set an input value!\n");
+                break;
+            }
+
+            BREAK_ON_NOT_A_VALUE(val, s, "missing input value!\n");
+
+            Params->Value = strtoull(val, NULL, 0xA);
+            Params->Flags.NumberSet = 1;
+
+            i++;
+        }
+        else if ( IS_1C_ARG(arg, 'x') )
+        {
+            if ( Params->Flags.BinarySet || Params->Flags.NumberSet )
+            {
+                s = ERROR_INVALID_PARAMETER;
+                EPrint("You've already set an input value!\n");
                 break;
             }
 
@@ -502,10 +531,13 @@ int checkParams(
         }
         else
         {
-            s = stripWhiteSpace(Params->BinaryValue);
+            s = stripWhiteSpace(Params->BinaryValue, 0x40);
             if ( s != 0 )
             {
-                EPrint("Binary value too small or too big!\n");
+                if ( s != -3 ) {
+                    EPrint("Binary value too small or too big!\n"); }
+                else {
+                    EPrint("Binary format invalid!\n"); }
             }
         }
     }

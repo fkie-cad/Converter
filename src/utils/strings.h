@@ -5,18 +5,22 @@
 
 
 
-int stripWhiteSpace(char* String)
+int stripWhiteSpace(char* String, uint32_t MaxSize)
 {
-    if ( !String )
+    int s = 0;
+
+    if ( !String || *String == 0 )
         return -1; // no string
 
-    char buffer[0x41] = {0};
+    if ( !MaxSize )
+        return -2; // no size
+
+    char* buffer = malloc(MaxSize + 1);
+    if ( !buffer )
+        return -4;
     char* stringPtr = String;
     size_t bufferOffset = 0;
     
-    if ( *stringPtr == 0 )
-        return -2; // string empty
-
     // copy stripped string into buffer
     while ( *stringPtr != 0 )
     {
@@ -26,9 +30,13 @@ int stripWhiteSpace(char* String)
             bufferOffset++;
         }
         stringPtr++;
-        if ( bufferOffset >= 0x40 && *stringPtr != 0 )
-            return -3; // binary to big
+        if ( bufferOffset >= MaxSize && *stringPtr != 0 )
+        {
+            s = -3; // binary to big
+            goto clean;
+        }
     }
+    buffer[min(bufferOffset,MaxSize)] = 0;
     
     // copy back
     char* bufferPtr = buffer;
@@ -42,7 +50,11 @@ int stripWhiteSpace(char* String)
     }
     *stringPtr = 0;
 
-    return 0;
+clean:
+    if ( buffer )
+        free(buffer);
+
+    return s;
 }
 
 // destructive
