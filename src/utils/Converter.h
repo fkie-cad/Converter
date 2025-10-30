@@ -146,7 +146,7 @@ int parseUint8(const char* arg, uint8_t* value, uint8_t base)
     if ( s != 0 ) return s;
     if ( s > (uint8_t)-1 )
     {
-        fprintf(stderr, "Error: %s could not be converted to a byte: Out of range!\n", arg);
+        printf("Error: %s could not be converted to a byte: Out of range!\n", arg);
         return 5;
     }
 
@@ -163,13 +163,13 @@ int parseUint64(const char* arg, uint64_t* value, uint8_t base)
 
     if ( base != 10 && base != 16 && base != 0 )
     {
-        fprintf(stderr, "Error: Unsupported base %u!\n", base);
+        printf("Error: Unsupported base %u!\n", base);
         return 1;
     }
 
     if ( arg[0] ==  '-' )
     {
-        fprintf(stderr, "Error: %s could not be converted to a number: is negative!\n", arg);
+        printf("Error: %s could not be converted to a number: is negative!\n", arg);
         return 2;
     }
 
@@ -182,12 +182,12 @@ int parseUint64(const char* arg, uint64_t* value, uint8_t base)
 
     if ( endptr == arg )
     {
-        fprintf(stderr, "Error: %s could not be converted to a number: Not a number!\n", arg);
+        printf("Error: %s could not be converted to a number: Not a number!\n", arg);
         return 3;
     }
     if ( result == (uint64_t)-1 && err_no == ERANGE )
     {
-        fprintf(stderr, "Error: %s could not be converted to a number: Out of range!\n", arg);
+        printf("Error: %s could not be converted to a number: Out of range!\n", arg);
         return 4;
     }
 

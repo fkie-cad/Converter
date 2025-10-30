@@ -1,17 +1,15 @@
-#include "inc/errors.h"
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
+#include "inc/errors.h"
 #if defined(_WIN32)
     #include <conio.h>
     #include <io.h>
     #include <windows.h>
 #else
-    #include "inc/errors.h"
     #include "utils/highlight.h"
 #endif
 #include "inc/cross.h"

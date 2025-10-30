@@ -1,8 +1,17 @@
-#include <windows.h>
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <inttypes.h>
 
+#include "inc/errors.h"
+#if defined(_WIN32)
+    #include <windows.h>
+#else
+#endif
+
+#include "inc/cross.h"
 #include "utils/Converter.h"
 
 #define FLAG_CHAR     (0x1)
@@ -29,7 +38,7 @@ int main(int argc, char** argv)
         printf("Usage: %s <type> [-k <key>] string...\n", argv[0]);
         printf("\n");
         printf("type: 1: char, 2: wchar, 4: reversed\n");
-        printf("-k: XOR encryption key given as a hex string\n");
+        printf("-k: XOR encryption key given as a hex string (no 0x prefix, byte alignend)\n");
         printf("strings: a set of strings to convert\n");
 
         return -1;
@@ -221,9 +230,9 @@ int fixLabel(char* Label, size_t* LabelSize, uint32_t Flags)
     }
 
     if ( Flags&FLAG_CHAR )
-        *(PUINT16)&Label[*LabelSize] = 0x615f; // _a
+        *(uint16_t*)&Label[*LabelSize] = 0x615f; // _a
     else if ( Flags&FLAG_WCHAR )
-        *(PUINT16)&Label[*LabelSize] = 0x775f; // _w
+        *(uint16_t*)&Label[*LabelSize] = 0x775f; // _w
     *LabelSize += 2;
     Label[*LabelSize] = 0;
 

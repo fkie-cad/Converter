@@ -16,9 +16,10 @@ MODE_RELEASE=2
 BUILD_TARGET_CLN=1
 BUILD_TARGET_DEL=2
 BUILD_TARGET_N2B=4
+BUILD_TARGET_S2A=8
 
 name=
-pos_targets="-n2b"
+pos_targets="-n2b,-s2a"
 def_target=0
 target=0
 build_mode=$MODE_RELEASE
@@ -111,6 +112,11 @@ function buildTarget() {
             local n2b_src="src/num2bin.c"
             gcc $flags $dpf $epf -o $dir/$bin_name $n2b_src
             ;;
+        $((BUILD_TARGET_S2A)))
+            local bin_name=string2array
+            local n2b_src="src/string2Array.c"
+            gcc $flags $dpf $epf -o $dir/$bin_name $n2b_src
+            ;;
             
         *)
             echo "Unknown target: ${target}"
@@ -130,6 +136,7 @@ function printHelp() {
     echo ""
     echo "Possible targets: ${pos_targets}"
     echo "  * -n2b: build num2bin application"
+    echo "  * -s2a: build string2array application"
     echo "-d Build in debug mode"
     echo "-r Build in release mode"
     echo "-s Build statically linked binary"
@@ -153,8 +160,12 @@ while (("$#")); do
             help=1
             break
             ;;
-        -n | -n2b | --num2bin)
+        -n2b | --num2bin)
             target=$(( target | BUILD_TARGET_N2B ))
+            shift 1
+            ;;
+        -s2a | --string2array)
+            target=$(( target | BUILD_TARGET_S2A ))
             shift 1
             ;;
         -p | -dp | --debug-print)
@@ -214,6 +225,7 @@ then
     echo "  clean: "$(( (target & BUILD_TARGET_CLN) > 0 ))
     echo "  del: "$(( (target & BUILD_TARGET_DEL) > 0 ))
     echo "  n2b: "$(( (target & BUILD_TARGET_N2B) > 0 ))
+    echo "  s2a: "$(( (target & BUILD_TARGET_S2A) > 0 ))
     echo "build_mode: "${build_mode}
     echo "debug_print: "${debug_print}
     echo "build_dir: "${build_dir}
@@ -226,9 +238,11 @@ fi
 #
 
 if (( $((target & BUILD_TARGET_CLN)) == $BUILD_TARGET_CLN )); then
+    target=$(( target & ~BUILD_TARGET_CLN ))
     clean ${build_dir} 1
 fi
 if (( $((target & BUILD_TARGET_DEL)) == $BUILD_TARGET_DEL )); then
+    target=$(( target & ~BUILD_TARGET_DEL ))
     clean ${build_dir} 2
 fi
 
