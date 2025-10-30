@@ -79,7 +79,7 @@ GOTO :ParseParams
     if [%1]==[/help] goto help
     
     :: projects
-    FOR /L %%i IN (0 1 %PROJ_ID_MAX%) DO  (
+    FOR /L %%i IN (0 1 %PROJ_ID_MAX%) DO (
         if /i [%~1] == [!cmdparams[%%i]!] (
             set /a cmpl[%%i]=1
             goto reParseParams

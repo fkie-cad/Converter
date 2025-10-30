@@ -20,7 +20,7 @@
 
 
 #define EXE_NAME "Num2Bin"
-#define EXE_VS "1.0.6"
+#define EXE_VS "1.0.7"
 #define EXE_LC "30.10.2025"
 
 
@@ -140,8 +140,8 @@ int num2bin(
 {
     int s = 0;
 
-    printf("decimal: %"PRIX64"u\n", Params->Value);
-    printf("hex: 0x%"PRIX64"x\n", Params->Value);
+    printf("decimal: %"PRIu64"\n", Params->Value);
+    printf("hex: 0x%"PRIX64"\n", Params->Value);
     printf("binary: ");
 
     uint32_t maxHighlightBit = 0;
@@ -216,15 +216,92 @@ int bin2num(
     
     // check values in binary string for 0 and 1
 
-     for ( i = 0; i < cb; i++ )
-     {
-         if ( BinaryValue[i] != '0' && BinaryValue[i] != '1' )
-         {
-             s = ERROR_INVALID_PARAMETER;
-             EPrint("Not a binary string number! (0x%x)\n", s);
-             return s;
-         }
-     }
+    uint64_t mask64 = 0xFEFEFEFEFEFEFEFE; // masked out lowest bit, cause 0 and 1 both are ok
+    //uint64_t xorv = 0xCFCFCFCFCFCFCFCF;
+    //uint64_t check = 0xFFFFFFFFFFFFFFFF;
+    uint64_t xorv = 0x3030303030303030; // the expected value now is 0, i.e. ascii 0x30
+    uint64_t check = 0x0; // xor result should be 0 for 0x30 (and 0x31&FE==0x30)
+    uint32_t parts = (uint32_t)cb / 8;
+    uint32_t rest = (uint32_t)cb % 8;
+
+    uint64_t* bin64ptr = (uint64_t*)&BinaryValue[0];
+    if ( cb >= 8 )
+    {
+        for ( i = 0; i < parts; i++ )
+        {
+            if ( ( ( *bin64ptr & mask64 ) ^ xorv ) != check )
+            {
+                s = ERROR_INVALID_PARAMETER;
+                EPrint("Not a binary string number! (0x%x)\n", s);
+                return s;
+            }
+            bin64ptr++;
+        }
+    }
+    
+    uint32_t* bin32ptr = (uint32_t*)bin64ptr;
+    if ( rest >= 4 )
+    {
+        parts = rest / 4;
+        rest = rest % 4;
+        
+        for ( i = 0; i < parts; i++ )
+        {
+            if ( ( ( *bin32ptr & (uint32_t)mask64 ) ^ (uint32_t)xorv ) != (uint32_t)check )
+            {
+                s = ERROR_INVALID_PARAMETER;
+                EPrint("Not a binary string number! (0x%x)\n", s);
+                return s;
+            }
+            bin32ptr++;
+        }
+    }
+    
+    uint16_t* bin16ptr = (uint16_t*)bin32ptr;
+    if ( rest >= 2 )
+    {
+        parts = rest / 2;
+        rest = rest % 2;
+        
+        for ( i = 0; i < parts; i++ )
+        {
+            if ( ( ( *bin16ptr & (uint16_t)mask64 ) ^ (uint16_t)xorv ) != (uint16_t)check )
+            {
+                s = ERROR_INVALID_PARAMETER;
+                EPrint("Not a binary string number! (0x%x)\n", s);
+                return s;
+            }
+            bin16ptr++;
+        }
+    }
+    
+    uint8_t* bin8ptr = (uint8_t*)bin16ptr;
+    if ( rest >= 1 )
+    {
+        parts = rest / 1;
+        rest = rest % 1;
+        
+        for ( i = 0; i < parts; i++ )
+        {
+            if ( ( ( *bin8ptr & (uint8_t)mask64 ) ^ (uint8_t)xorv ) != (uint8_t)check )
+            {
+                s = ERROR_INVALID_PARAMETER;
+                EPrint("Not a binary string number! (0x%x)\n", s);
+                return s;
+            }
+            bin8ptr++;
+        }
+    }
+
+     //for ( i = 0; i < cb; i++ )
+     //{
+     //    if ( BinaryValue[i] != '0' && BinaryValue[i] != '1' )
+     //    {
+     //        s = ERROR_INVALID_PARAMETER;
+     //        EPrint("Not a binary string number! (0x%x)\n", s);
+     //        return s;
+     //    }
+     //}
 
     // convert string to int
     for ( i = 0; i < cb; i++ )
