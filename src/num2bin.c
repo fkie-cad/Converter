@@ -22,8 +22,8 @@
 
 
 #define EXE_NAME "Num2Bin"
-#define EXE_VS "1.0.4"
-#define EXE_LC "22.04.2024"
+#define EXE_VS "1.0.6"
+#define EXE_LC "30.10.2025"
 
 
 #define WIDTH_INT8    (0x8)
@@ -164,11 +164,10 @@ int num2bin(
 
     for ( int32_t i = end-1; i >= 0; i-- )
     {
+        if ( !( (highlights >> i) & 1 ) )
 #if defined(_WIN32)
-        if ( !( (highlights >> i) & 1 ) )
             SetConsoleTextAttribute(hStdout, FOREGROUND_INTENSITY);
-    #else
-        if ( !( (highlights >> i) & 1 ) )
+#else
             setAnsiFormat(LIGHT_STYLE);
 #endif
 
@@ -182,11 +181,10 @@ int num2bin(
             putchar(' ');
         }
 
+        if ( !( (highlights >> i) & 1 ) )
 #if defined(_WIN32)
-        if ( !( (highlights >> i) & 1 ) )
             SetConsoleTextAttribute(hStdout, wOldColorAttrs);
-    #else
-        if ( !( (highlights >> i) & 1 ) )
+#else
             resetAnsiFormat();
 #endif
     }
@@ -268,6 +266,8 @@ uint64_t getHighlightMask(
         if ( *ptr == ':' )
         {
             *ptr = 0;
+            if ( !(*last) )
+                goto clean;
             val0 = strtoul(last, NULL, 0);
             last = ptr + 1;
 
@@ -279,6 +279,8 @@ uint64_t getHighlightMask(
                 || *ptr == ';' )
         {
             *ptr = 0;
+            if ( !(*last) )
+                goto clean;
             *value = strtoul(last, NULL, 0);
             
             if ( mode == 1 )

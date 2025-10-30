@@ -76,8 +76,8 @@ Converts a given number into binary format or a binary string to hex and decimal
 Highlights selected bits.
 
 ### version
-1.0.4  
-Last changed: 22.04.2024
+1.0.6  
+Last changed: 30.10.2025
 
 ### build
 ```bash
