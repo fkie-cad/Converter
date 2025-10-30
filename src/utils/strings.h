@@ -1,5 +1,10 @@
 #pragma once
 
+#include <stdint.h>
+#include <malloc.h>
+
+#include "../inc/cross.h"
+
 #define IS_LC_CHAR(__char__) \
     ( (__char__) >= 'a' && (__char__) <= 'z' )
 
@@ -8,6 +13,7 @@
 int stripWhiteSpace(char* String, uint32_t MaxSize)
 {
     int s = 0;
+    char* bufferPtr = NULL;
 
     if ( !String || *String == 0 )
         return -1; // no string
@@ -15,7 +21,7 @@ int stripWhiteSpace(char* String, uint32_t MaxSize)
     if ( !MaxSize )
         return -2; // no size
 
-    char* buffer = malloc(MaxSize + 1);
+    char* buffer = (char*)malloc(MaxSize + 1);
     if ( !buffer )
         return -4;
     char* stringPtr = String;
@@ -39,7 +45,7 @@ int stripWhiteSpace(char* String, uint32_t MaxSize)
     buffer[min(bufferOffset,MaxSize)] = 0;
     
     // copy back
-    char* bufferPtr = buffer;
+    bufferPtr = buffer;
     stringPtr = String;
     while ( *bufferPtr != 0 )
     {
@@ -132,7 +138,7 @@ size_t split(char* str, const char* delimiter, char** bucket, const size_t bucke
     return token_id;
 }
 
-BOOL startsWith(PCHAR string, PCHAR prefix)
+int startsWith(char* string, char* prefix)
 {
     char* pfxPtr = prefix;
     char* strPtr = string;
@@ -151,7 +157,7 @@ BOOL startsWith(PCHAR string, PCHAR prefix)
     return *pfxPtr == 0;
 }
 
-PCHAR strToUC(PCHAR string)
+char* strToUC(char* string)
 {
     char* strPtr = string;
 

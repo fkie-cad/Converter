@@ -4,14 +4,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #if defined(_WIN32)
     #include <conio.h>
     #include <io.h>
     #include <windows.h>
 #else
-    #include "errors.h"
+    #include "inc/errors.h"
+    #include "utils/highlight.h"
 #endif
+#include "inc/cross.h"
 
 #include "Args.h"
 #include "print.h"
@@ -36,9 +39,7 @@
 
 #define DEFAULT_ALIGN (0x8)
 
-#ifndef ALIGN_UP_BY
-#define ALIGN_UP_BY(Address, Align) ( ((ULONG_PTR)(Address) + (Align) - 1) & ~((Align) - 1) )
-#endif
+
 
 
 typedef struct _CMD_PARAMS {
@@ -141,8 +142,8 @@ int num2bin(
 {
     int s = 0;
 
-    printf("decimal: %llu\n", Params->Value);
-    printf("hex: 0x%llx\n", Params->Value);
+    printf("decimal: %"PRIX64"u\n", Params->Value);
+    printf("hex: 0x%"PRIX64"x\n", Params->Value);
     printf("binary: ");
 
     uint32_t maxHighlightBit = 0;
@@ -152,7 +153,7 @@ int num2bin(
     Params->Width = max(Params->Width, valueHCb*4);
     uint32_t end = max(Params->Width, maxHighlightBit+1);
     end = ALIGN_UP_BY(end, DEFAULT_ALIGN);
-    
+
 #if defined(_WIN32)
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
     WORD wOldColorAttrs;
@@ -166,6 +167,9 @@ int num2bin(
 #if defined(_WIN32)
         if ( !( (highlights >> i) & 1 ) )
             SetConsoleTextAttribute(hStdout, FOREGROUND_INTENSITY);
+    #else
+        if ( !( (highlights >> i) & 1 ) )
+            setAnsiFormat(LIGHT_STYLE);
 #endif
 
         if ( ( (Params->Value >> i) & 1 ) )
@@ -181,6 +185,9 @@ int num2bin(
 #if defined(_WIN32)
         if ( !( (highlights >> i) & 1 ) )
             SetConsoleTextAttribute(hStdout, wOldColorAttrs);
+    #else
+        if ( !( (highlights >> i) & 1 ) )
+            resetAnsiFormat();
 #endif
     }
 
