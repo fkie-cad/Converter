@@ -1,33 +1,39 @@
+#ifdef _WIN32
 #include <windows.h>
 #include <winioctl.h>
+#else
+#include "inc/winioctl.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 
 #include "print.h"
 #include "utils/strings.h"
  
 #define EXE_NAME "CtlCode"
-#define EXE_VS "1.0.2"
-#define EXE_LC "30.04.2024"
+#define EXE_VS "1.0.3"
+#define EXE_LC "12.12.2025"
     
-#define ACCESS_FROM_CTL_CODE(ctrlCode)          (((ULONG)((ioctl) & 0xC000)) >> 14)
-#define FUNCTION_FROM_CTL_CODE(ctrlCode)        (((ULONG)((ioctl) & 0x3FFC)) >> 2)
+#define ACCESS_FROM_CTL_CODE(ctrlCode)          (((uint32_t)((ioctl) & 0xC000)) >> 14)
+#define FUNCTION_FROM_CTL_CODE(ctrlCode)        (((uint32_t)((ioctl) & 0x3FFC)) >> 2)
 
-PCHAR getDeviceTypeString(_In_ ULONG DeviceType);
-PCHAR getMethodString(_In_ ULONG Method);
-PCHAR getAccessString(_In_ ULONG Method, _Out_ PCHAR Buffer, ULONG BufferSize);
+char* getDeviceTypeString(_In_ DEVICE_TYPE DeviceType);
+char* getMethodString(_In_ uint32_t Method);
+char* getAccessString(_In_ uint32_t Method, _Out_ char* Buffer, uint32_t BufferSize);
 
-ULONG deviceTypeStringToInt(_In_ PCHAR DeviceType);
-ULONG methodStringToInt(_In_ PCHAR Method);
-ULONG accessStringToInt(_In_ PCHAR Access);
+uint32_t deviceTypeStringToInt(_In_ char* DeviceType);
+uint32_t methodStringToInt(_In_ char* Method);
+uint32_t accessStringToInt(_In_ char* Access);
 
 
 
-INT __cdecl main(int argc, char** argv)
+int __cdecl main(int argc, char** argv)
 {
-    CHAR accessBuffer[0x40];
-    ULONG accessBufferSize = 0x40;
+    char accessBuffer[0x40];
+    uint32_t accessBufferSize = 0x40;
 
     if ( argc < 2 )
     {
@@ -38,15 +44,15 @@ INT __cdecl main(int argc, char** argv)
     if ( argc >= 5 )
     {
 
-        ULONG deviceType = 0;
-        ULONG method = 0;
-        ULONG access = 0;
+        uint32_t deviceType = 0;
+        uint32_t method = 0;
+        uint32_t access = 0;
         if ( startsWith(argv[1], "FILE_DEVICE_") )
             deviceType = deviceTypeStringToInt(argv[1]);
         else
             deviceType = strtoul(argv[1], NULL, 0x10);
 
-        ULONG function = strtoul(argv[2], NULL, 0x10);
+        uint32_t function = strtoul(argv[2], NULL, 0x10);
         
         if ( startsWith(argv[3], "METHOD_") )
             method = methodStringToInt(argv[3]);
@@ -57,7 +63,7 @@ INT __cdecl main(int argc, char** argv)
             access = accessStringToInt(argv[4]);
         else
             access = strtoul(argv[4], NULL, 0x10);
-        ULONG ioctl = CTL_CODE(deviceType, function, method, access);
+        uint32_t ioctl = CTL_CODE(deviceType, function, method, access);
         
         printf("deviceType: 0x%x (%s)\n", deviceType, getDeviceTypeString(deviceType));
         printf("function: 0x%x\n", function);
@@ -69,14 +75,14 @@ INT __cdecl main(int argc, char** argv)
     }
     else
     {
-        ULONG ioctl = strtoul(argv[1], NULL, 0x10);
+        uint32_t ioctl = strtoul(argv[1], NULL, 0x10);
      
         // 31             16 15 14 13             2 1 0
         // |  DeviceType   | | Ac| | Function     | |m|
-        ULONG deviceType = DEVICE_TYPE_FROM_CTL_CODE(ioctl);
-        ULONG function = FUNCTION_FROM_CTL_CODE(ioctl);
-        ULONG method = METHOD_FROM_CTL_CODE(ioctl);
-        ULONG access = ACCESS_FROM_CTL_CODE(ioctl);
+        uint32_t deviceType = DEVICE_TYPE_FROM_CTL_CODE(ioctl);
+        uint32_t function = FUNCTION_FROM_CTL_CODE(ioctl);
+        uint32_t method = METHOD_FROM_CTL_CODE(ioctl);
+        uint32_t access = ACCESS_FROM_CTL_CODE(ioctl);
             
         printf("ioctl: 0x%x\n", ioctl);
         printf("\n");
@@ -90,7 +96,7 @@ INT __cdecl main(int argc, char** argv)
     return 0;
 }
 
-PCHAR getDeviceTypeString(_In_ ULONG DeviceType)
+char* getDeviceTypeString(_In_ DEVICE_TYPE DeviceType)
 {
     switch ( DeviceType )
     {
@@ -187,7 +193,7 @@ PCHAR getDeviceTypeString(_In_ ULONG DeviceType)
     }
 }
 
-ULONG deviceTypeStringToInt(_In_ PCHAR DeviceType)
+uint32_t deviceTypeStringToInt(_In_ char* DeviceType)
 {
     DeviceType = strToUC(DeviceType);
 
@@ -281,10 +287,10 @@ ULONG deviceTypeStringToInt(_In_ PCHAR DeviceType)
     if ( strcmp(DeviceType, "FILE_DEVICE_USB4") == 0 ) return FILE_DEVICE_USB4;
     if ( strcmp(DeviceType, "FILE_DEVICE_SOUNDWIRE") == 0 ) return FILE_DEVICE_SOUNDWIRE;
     
-    return (ULONG)-1;
+    return (uint32_t)-1;
 }
 
-PCHAR getMethodString(_In_ ULONG Method)
+char* getMethodString(_In_ uint32_t Method)
 {
     switch ( Method )
     {
@@ -296,7 +302,7 @@ PCHAR getMethodString(_In_ ULONG Method)
     }
 }
 
-ULONG methodStringToInt(_In_ PCHAR Method)
+uint32_t methodStringToInt(_In_ char* Method)
 {
     Method = strToUC(Method);
 
@@ -305,24 +311,24 @@ ULONG methodStringToInt(_In_ PCHAR Method)
     if ( strcmp(Method, "METHOD_OUT_DIRECT") == 0 ) return METHOD_OUT_DIRECT;
     if ( strcmp(Method, "METHOD_NEITHER") == 0 ) return METHOD_NEITHER;
     
-    return (ULONG)-1;
+    return (uint32_t)-1;
 }
 
-PCHAR getAccessString(_In_ ULONG Access, _Out_ PCHAR Buffer, ULONG BufferSize)
+char* getAccessString(_In_ uint32_t Access, _Out_ char* Buffer, uint32_t BufferSize)
 {
-    PCHAR ptr = Buffer;
-    PCHAR sep = NULL;
-    ULONG restSize = BufferSize;
+    char* ptr = Buffer;
+    char* sep = NULL;
+    uint32_t restSize = BufferSize;
     Buffer[0] = 0;
-    INT cch;
+    int cch;
 
     if ( Access == FILE_ANY_ACCESS )
     {
         sep = ( ptr != Buffer ) ? " | " : "";
         cch = sprintf_s(ptr, restSize, "%s%s", sep, "FILE_ANY_ACCESS");
         if ( cch <= 0 ) return Buffer;
-        restSize -= (ULONG)cch;
-        ptr += (ULONG)cch;
+        restSize -= (uint32_t)cch;
+        ptr += (uint32_t)cch;
         return Buffer;
     }
 
@@ -331,39 +337,39 @@ PCHAR getAccessString(_In_ ULONG Access, _Out_ PCHAR Buffer, ULONG BufferSize)
         sep = ( ptr != Buffer ) ? " | " : "";
         cch = sprintf_s(ptr, restSize, "%s%s", sep, "FILE_READ_DATA");
         if ( cch <= 0 ) return Buffer;
-        restSize -= (ULONG)cch;
-        ptr += (ULONG)cch;
+        restSize -= (uint32_t)cch;
+        ptr += (uint32_t)cch;
     }
     if ( Access & FILE_WRITE_DATA )
     {
         sep = ( ptr != Buffer ) ? " | " : "";
         cch = sprintf_s(ptr, restSize, "%s%s", sep, "FILE_WRITE_DATA");
         if ( cch <= 0 ) return Buffer;
-        restSize -= (ULONG)cch;
-        ptr += (ULONG)cch;
+        restSize -= (uint32_t)cch;
+        ptr += (uint32_t)cch;
     }
     if ( ptr == Buffer )
     {
         cch = sprintf_s(ptr, restSize, "%s", "unknown");
         if ( cch <= 0 ) return Buffer;
-        restSize -= (ULONG)cch;
-        ptr += (ULONG)cch;
+        restSize -= (uint32_t)cch;
+        ptr += (uint32_t)cch;
     }
 
     return Buffer;
 }
 
-ULONG accessStringToInt(_In_ PCHAR Access)
+uint32_t accessStringToInt(_In_ char* Access)
 {
     size_t bucket_max = 5;
     char* bucket[5] = { 0 };
     size_t nr_elem = split(Access, "|", bucket, bucket_max);
 
     if ( !nr_elem )
-        return (ULONG)-1;
+        return (uint32_t)-1;
 
-    ULONG access = 0;
-    BOOL valid = FALSE;
+    uint32_t access = 0;
+    int valid = 0;
 
     for ( size_t i = 0; i < nr_elem; i++ )
     {
@@ -373,24 +379,24 @@ ULONG accessStringToInt(_In_ PCHAR Access)
         if ( strcmp(bucket[i], "FILE_ANY_ACCESS") == 0 )
         {
             access |= FILE_ANY_ACCESS;
-            valid = TRUE;
+            valid = 1;
         }
         else if ( strcmp(bucket[i], "FILE_READ_DATA") == 0 
                || strcmp(bucket[i], "FILE_READ_ACCESS") == 0 )
         {
             access |= FILE_READ_DATA;
-            valid = TRUE;
+            valid = 1;
         }
         else if ( strcmp(bucket[i], "FILE_WRITE_DATA") == 0 
                || strcmp(bucket[i], "FILE_WRITE_ACCESS") == 0 )
         {
             access |= FILE_WRITE_DATA;
-            valid = TRUE;
+            valid = 1;
         }
     }
 
     if ( valid )
         return access;
     else
-        return (ULONG)-1;
+        return (uint32_t)-1;
 }

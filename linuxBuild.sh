@@ -13,13 +13,14 @@ BUILD_FLAG_STATIC=1
 MODE_DEBUG=1
 MODE_RELEASE=2
 
-BUILD_TARGET_CLN=1
-BUILD_TARGET_DEL=2
-BUILD_TARGET_N2B=4
-BUILD_TARGET_S2A=8
+BUILD_TARGET_CLN=0x1
+BUILD_TARGET_DEL=0x2
+BUILD_TARGET_N2B=0x4
+BUILD_TARGET_S2A=0x8
+BUILD_TARGET_CTL=0x10
 
 name=
-pos_targets="-n2b,-s2a"
+pos_targets="-ctl, -n2b,-s2a"
 def_target=0
 target=0
 build_mode=$MODE_RELEASE
@@ -107,20 +108,29 @@ function buildTarget() {
     
     
     case $target in
+    
+        $((BUILD_TARGET_CTL)))
+            local bin_name=ctlCode
+            local src="src/ctlCode.c"
+            gcc $flags $dpf $epf -o $dir/$bin_name $src
+            ;;
+    
         $((BUILD_TARGET_N2B)))
             local bin_name=num2bin
-            local n2b_src="src/num2bin.c"
-            gcc $flags $dpf $epf -o $dir/$bin_name $n2b_src
+            local src="src/num2bin.c"
+            gcc $flags $dpf $epf -o $dir/$bin_name $src
             ;;
+    
         $((BUILD_TARGET_S2A)))
             local bin_name=string2array
-            local n2b_src="src/string2Array.c"
-            gcc $flags $dpf $epf -o $dir/$bin_name $n2b_src
+            local src="src/string2Array.c"
+            gcc $flags $dpf $epf -o $dir/$bin_name $src
             ;;
             
         *)
             echo "Unknown target: ${target}"
             ;;
+
     esac
 
     return $?
@@ -135,6 +145,7 @@ function printHelp() {
     printUsage
     echo ""
     echo "Possible targets: ${pos_targets}"
+    echo "  * -ctl: build ctlCode application"
     echo "  * -n2b: build num2bin application"
     echo "  * -s2a: build string2array application"
     echo "-d Build in debug mode"
@@ -160,6 +171,13 @@ while (("$#")); do
             help=1
             break
             ;;
+        #
+        # targets
+        #
+        -ctl | --ctlCode)
+            target=$(( target | BUILD_TARGET_CTL ))
+            shift 1
+            ;;
         -n2b | --num2bin)
             target=$(( target | BUILD_TARGET_N2B ))
             shift 1
@@ -168,6 +186,10 @@ while (("$#")); do
             target=$(( target | BUILD_TARGET_S2A ))
             shift 1
             ;;
+
+        #
+        # other
+        #
         -p | -dp | --debug-print)
             debug_print=$2
             shift 2
@@ -224,6 +246,7 @@ then
     echo "target: "${target}
     echo "  clean: "$(( (target & BUILD_TARGET_CLN) > 0 ))
     echo "  del: "$(( (target & BUILD_TARGET_DEL) > 0 ))
+    echo "  ctl: "$(( (target & BUILD_TARGET_CTL) > 0 ))
     echo "  n2b: "$(( (target & BUILD_TARGET_N2B) > 0 ))
     echo "  s2a: "$(( (target & BUILD_TARGET_S2A) > 0 ))
     echo "build_mode: "${build_mode}
