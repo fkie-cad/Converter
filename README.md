@@ -30,8 +30,8 @@ Converts a given ioctl code into its parts (DeviceType, Function, Method, Access
   or the parts into an ioctl code.
 
 ### version
-1.0.2  
-Last changed: 30.04.2024
+1.0.3  
+Last changed: 12.12.2025  
 
 ### build
 ```bash
@@ -59,7 +59,7 @@ access: 0x2 (FILE_WRITE_DATA)
 ioctl: 0x10800c
 
 # convert parts (<DeviceType> <Function> <Method> <Access>) given as strings into ioctl code.
-$ CtlCode.exe FILE_DEVICE_UCM 1 METHOD_NEITHER FILE_READ_DATA^|FILE_WRITE_ACCESS
+$ CtlCode.exe FILE_DEVICE_UCM 1 METHOD_NEITHER "FILE_READ_DATA|FILE_WRITE_ACCESS"
 deviceType: 0x57 (FILE_DEVICE_UCM)
 function: 0x1
 method: 0x3 (METHOD_NEITHER)
