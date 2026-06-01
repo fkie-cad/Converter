@@ -19,11 +19,14 @@
 #define FLAG_REVERSED (0x4)
 #define FLAG_XOR      (0x8)
 
+#define LABEL_SIZE (0x200)
+#define MAX_DIRTY_LABEL_SIZE (LABEL_SIZE-2)
+
 int fixLabel(char* Label, size_t* LabelSize, uint32_t Flags);
 
-void toCharEl(char c, size_t i, uint8_t* Key, uint32_t KeySize, uint32_t flags);
+void toCharEl(char c, size_t i, uint8_t* Key, size_t KeySize, uint32_t flags);
 
-void toWCharEl(char c, size_t i, uint8_t* Key, uint32_t KeySize, uint32_t flags);
+void toWCharEl(char c, size_t i, uint8_t* Key, size_t KeySize, uint32_t flags);
 
 
 
@@ -45,7 +48,7 @@ int main(int argc, char** argv)
     }
 
     uint32_t flags = strtoul(argv[1], NULL, 0);
-    char label[0x200];
+    char label[LABEL_SIZE];
     char* string = NULL;
     size_t stringSize;
     size_t labelSize;
@@ -53,7 +56,7 @@ int main(int argc, char** argv)
     int arg_i;
     int start_i = 2;
     uint8_t* key = NULL;
-    uint32_t keySize = 0;
+    size_t keySize = 0;
 
     // check mode
     uint32_t f = flags&(FLAG_CHAR|FLAG_WCHAR);
@@ -85,11 +88,13 @@ int main(int argc, char** argv)
             continue;
 
         label[0] = 0;
-        labelSize = stringSize;
 
         if ( flags & FLAG_CHAR )
         {
-            strcpy_s(label, 0x200, string);
+            s = strcpy_s(label, MAX_DIRTY_LABEL_SIZE, string);
+            if ( s != 0 )
+                goto clean;
+            labelSize = strlen(label);
             fixLabel(label, &labelSize, flags);
             
             printf("CHAR %s[%zu] = { ", label, stringSize+1);
@@ -97,10 +102,12 @@ int main(int argc, char** argv)
             if ( flags & FLAG_REVERSED )
             {
                 printf("0, ");
-                for ( i = stringSize-1; i >= 1; i-- )
+                i = stringSize-1;
+                do
                 {
                     toCharEl(string[i], i,key, keySize, 0);
                 }
+                while ( i-- > 0 );
                 if ( string[i] == '\\' )
                     printf("'\\\\' }");
                 else
@@ -125,7 +132,10 @@ int main(int argc, char** argv)
 
         if ( flags & FLAG_WCHAR )
         {
-            strcpy_s(label, 0x200, string);
+            s = strcpy_s(label, MAX_DIRTY_LABEL_SIZE, string);
+            if ( s != 0 )
+                goto clean;
+            labelSize = strlen(label);
             fixLabel(label, &labelSize, flags);
 
             printf("WCHAR %s[%zu] = { ", label, stringSize+1);
@@ -133,10 +143,12 @@ int main(int argc, char** argv)
             if ( flags & FLAG_REVERSED )
             {
                 printf("0, ");
-                for ( i = stringSize-1; i >= 1; i-- )
+                i = stringSize-1;
+                do
                 {
                     toWCharEl(string[i], i, key, keySize, 0);
                 }
+                while ( i-- > 0 );
                 if ( string[i] == '\\' )
                     printf("L'\\\\' }");
                 else
@@ -156,13 +168,14 @@ int main(int argc, char** argv)
         printf("\n");
     }
 
+clean:
     if ( key )
         free(key);
 
     return s;
 }
 
-void toCharEl(char c, size_t i, uint8_t* Key, uint32_t KeySize, uint32_t flags)
+void toCharEl(char c, size_t i, uint8_t* Key, size_t KeySize, uint32_t flags)
 {
     if ( Key == NULL )
     {
@@ -184,7 +197,7 @@ void toCharEl(char c, size_t i, uint8_t* Key, uint32_t KeySize, uint32_t flags)
     }
 }
 
-void toWCharEl(char c, size_t i, uint8_t* Key, uint32_t KeySize, uint32_t flags)
+void toWCharEl(char c, size_t i, uint8_t* Key, size_t KeySize, uint32_t flags)
 {
     if ( Key == NULL )
     {

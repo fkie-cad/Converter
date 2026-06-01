@@ -28,7 +28,7 @@
 
 typedef struct _BUFFER {
     uint8_t* Bytes;
-    uint32_t Size;
+    size_t Size;
 } BUFFER, *PBUFFER;
 
 typedef struct _FLAGS {
@@ -482,7 +482,12 @@ int parseParams(
             }
             BREAK_ON_NOT_A_VALUE(val, s, "[e] missing string\n");
 
-            Data->Size = (uint32_t)strlen(val) + 1;
+            if ( strlen(val) > ((size_t)-1) - 1 )
+            {
+                s = -1;
+                break;
+            }
+            Data->Size = strlen(val) + 1;
             Data->Bytes = (uint8_t*)malloc(Data->Size);
             if ( !Data->Bytes )
             {
@@ -502,8 +507,14 @@ int parseParams(
                 continue;
             }
             BREAK_ON_NOT_A_VALUE(val, s, "[e] missing string\n");
+            
+            if ( strlen(val) > (((size_t)-1) - 1)/2 )
+            {
+                s = -1;
+                break;
+            }
 
-            Data->Size = (uint32_t)((strlen(val) + 1)*2);
+            Data->Size = (strlen(val) + 1) * 2;
             Data->Bytes = (uint8_t*)malloc(Data->Size);
             if ( !Data->Bytes )
             {

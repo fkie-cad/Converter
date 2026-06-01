@@ -20,8 +20,8 @@
 
 
 #define EXE_NAME "Num2Bin"
-#define EXE_VS "1.0.7"
-#define EXE_LC "30.10.2025"
+#define EXE_VS "1.0.8"
+#define EXE_LC "01.06.2026"
 
 
 #define WIDTH_INT8    (0x8)
@@ -216,7 +216,7 @@ int bin2num(
     
     // check values in binary string for 0 and 1
 
-    uint64_t mask64 = 0xFEFEFEFEFEFEFEFE; // masked out lowest bit, cause 0 and 1 both are ok
+    uint64_t mask64 = 0xFEFEFEFEFEFEFEFE; // masked out lowest bit of each byte, cause 0 and 1 both are ok
     //uint64_t xorv = 0xCFCFCFCFCFCFCFCF;
     //uint64_t check = 0xFFFFFFFFFFFFFFFF;
     uint64_t xorv = 0x3030303030303030; // the expected value now is 0, i.e. ascii 0x30
@@ -361,7 +361,18 @@ uint64_t getHighlightMask(
             if ( mode == 1 )
             {
                 if ( val0 > 63 || val1 > 63 )
+                {
+                    // reset state
+                    mode = 0;
+                    value = &val0;
+
+                    val0 = (uint32_t)-1;
+                    val1 = (uint32_t)-1;
+
+                    last = ptr + 1;
+
                     goto skip;
+                }
 
                 if ( val0 > val1 )
                 {

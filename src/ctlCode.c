@@ -3,6 +3,7 @@
 #include <winioctl.h>
 #else
 #include "inc/winioctl.h"
+#include "inc/deviceTypes.h"
 #endif
 
 #include <stdio.h>
@@ -14,11 +15,11 @@
 #include "utils/strings.h"
  
 #define EXE_NAME "CtlCode"
-#define EXE_VS "1.0.3"
-#define EXE_LC "12.12.2025"
+#define EXE_VS "1.0.4"
+#define EXE_LC "01.06.2026"
     
-#define ACCESS_FROM_CTL_CODE(ctrlCode)          (((uint32_t)((ioctl) & 0xC000)) >> 14)
-#define FUNCTION_FROM_CTL_CODE(ctrlCode)        (((uint32_t)((ioctl) & 0x3FFC)) >> 2)
+#define ACCESS_FROM_CTL_CODE(ioctl)          (((uint32_t)((ioctl) & 0xC000)) >> 14)
+#define FUNCTION_FROM_CTL_CODE(ioctl)        (((uint32_t)((ioctl) & 0x3FFC)) >> 2)
 
 char* getDeviceTypeString(_In_ DEVICE_TYPE DeviceType);
 char* getMethodString(_In_ uint32_t Method);
@@ -50,19 +51,19 @@ int __cdecl main(int argc, char** argv)
         if ( startsWith(argv[1], "FILE_DEVICE_") )
             deviceType = deviceTypeStringToInt(argv[1]);
         else
-            deviceType = strtoul(argv[1], NULL, 0x10);
+            deviceType = strtoul(argv[1], NULL, 0);
 
-        uint32_t function = strtoul(argv[2], NULL, 0x10);
+        uint32_t function = strtoul(argv[2], NULL, 0);
         
         if ( startsWith(argv[3], "METHOD_") )
             method = methodStringToInt(argv[3]);
         else
-            method = strtoul(argv[3], NULL, 0x10);
+            method = strtoul(argv[3], NULL, 0);
         
         if ( startsWith(argv[4], "FILE_") )
             access = accessStringToInt(argv[4]);
         else
-            access = strtoul(argv[4], NULL, 0x10);
+            access = strtoul(argv[4], NULL, 0);
         uint32_t ioctl = CTL_CODE(deviceType, function, method, access);
         
         printf("deviceType: 0x%x (%s)\n", deviceType, getDeviceTypeString(deviceType));

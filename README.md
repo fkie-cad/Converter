@@ -30,8 +30,8 @@ Converts a given ioctl code into its parts (DeviceType, Function, Method, Access
   or the parts into an ioctl code.
 
 ### version
-1.0.3  
-Last changed: 12.12.2025  
+1.0.4  
+Last changed: 01.06.2026  
 
 ### build
 ```bash
@@ -77,7 +77,7 @@ Highlights selected bits.
 
 ### version
 1.0.7  
-Last changed: 30.10.2025
+Last changed: 01.06.2026
 
 ### build
 ```bash
@@ -128,8 +128,8 @@ $ NtStatus2DosError 0xC0000005
 Convert string into array of chars.
 
 ### version
-1.0.0  
-Last changed: 21.04.2023
+1.0.1  
+Last changed: 01.06.2026
 
 ### build
 ```bash
@@ -160,8 +160,8 @@ $ String2Arr 1 -k 41 bla // convert bla to xored char array and xor with 0x41
 Convert strings into hex or hex into string.
 
 ### version
-1.0.0  
-Last changed: 21.04.2023
+1.0.1  
+Last changed: 01.06.2026
 
 ### build
 ```bash

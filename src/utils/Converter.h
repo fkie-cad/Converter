@@ -5,16 +5,6 @@
 
 
 
-int parsePlainBytes(
-    _In_ const char* Raw, 
-    _Inout_ uint8_t** Buffer, 
-    _Inout_ uint32_t* Size, 
-    _In_ uint32_t MaxBytes
-);
-int parseUint8(const char* arg, uint8_t* value, uint8_t base);
-int parseUint64(const char* arg, uint64_t* value, uint8_t base);
-
-
 
 #define IS_NUM_CHAR(__char__) \
     ( __char__ >= '0' && __char__ <= '9' )
@@ -34,15 +24,15 @@ int parseUint64(const char* arg, uint64_t* value, uint8_t base);
 int parsePlainBytes(
     _In_ const char* Raw, 
     _Inout_ uint8_t** Buffer, 
-    _Inout_ uint32_t* Size, 
+    _Inout_ size_t* Size, 
     _In_ uint32_t MaxBytes
 )
 {
-    uint32_t i, j;
+    size_t i, j;
     size_t raw_size = strlen(Raw);
     uint8_t* p = NULL;
     int malloced = 0;
-    uint32_t buffer_size;
+    size_t buffer_size;
     int s = 0;
 
     uint8_t m1, m2;
@@ -68,7 +58,7 @@ int parsePlainBytes(
 
     if ( *Size && *Buffer && buffer_size > *Size )
     {
-        printf("Provided buffer is too small: 0x%x < 0x%x!\n", *Size, buffer_size);
+        printf("Provided buffer is too small: 0x%zx < 0x%zx!\n", *Size, buffer_size);
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -89,13 +79,6 @@ int parsePlainBytes(
 
     for ( i = 0, j = 0; i < raw_size; i += 2, j++ )
     {
-        //if ( !IN_HEX_RANGE(Raw[i]) || !IN_HEX_RANGE(Raw[i+1]) )
-        //{
-        //    s = ERROR_INVALID_PARAMETER;
-        //    printf("Error: Byte string not in hex range!\n");
-        //    break;
-        //}
-
         if ( IS_NUM_CHAR(Raw[i]) )
             m1 = 0x30;
         else if ( IS_UC_HEX_CHAR(Raw[i]) )
@@ -137,62 +120,6 @@ int parsePlainBytes(
     }
 
     return s;
-}
-
-int parseUint8(const char* arg, uint8_t* value, uint8_t base)
-{
-    uint64_t result;
-    int s = parseUint64(arg, &result, base);
-    if ( s != 0 ) return s;
-    if ( s > (uint8_t)-1 )
-    {
-        printf("Error: %s could not be converted to a byte: Out of range!\n", arg);
-        return 5;
-    }
-
-    *value = (uint8_t) result;
-    return 0;
-}
-
-int parseUint64(const char* arg, uint64_t* value, uint8_t base)
-{
-    char* endptr;
-    int err_no = 0;
-    errno = 0;
-    uint64_t result;
-
-    if ( base != 10 && base != 16 && base != 0 )
-    {
-        printf("Error: Unsupported base %u!\n", base);
-        return 1;
-    }
-
-    if ( arg[0] ==  '-' )
-    {
-        printf("Error: %s could not be converted to a number: is negative!\n", arg);
-        return 2;
-    }
-
-#if defined(_WIN32)
-    result = strtoull(arg, &endptr, base);
-#else
-    result = strtoul(arg, &endptr, base);
-#endif
-    err_no = errno;
-
-    if ( endptr == arg )
-    {
-        printf("Error: %s could not be converted to a number: Not a number!\n", arg);
-        return 3;
-    }
-    if ( result == (uint64_t)-1 && err_no == ERANGE )
-    {
-        printf("Error: %s could not be converted to a number: Out of range!\n", arg);
-        return 4;
-    }
-
-    *value = result;
-    return 0;
 }
 
 #endif
