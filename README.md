@@ -128,8 +128,8 @@ $ NtStatus2DosError 0xC0000005
 Convert string into array of chars.
 
 ### version
-1.0.1  
-Last changed: 01.06.2026
+1.0.2  
+Last changed: 24.06.2026
 
 ### build
 ```bash

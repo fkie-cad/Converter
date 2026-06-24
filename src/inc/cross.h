@@ -18,7 +18,6 @@
     #define _Out_
     #define strtok_s strtok_r
     #define strtok_s strtok_r
-    #define strcpy_s(dst, size, src) strcpy(dst, src)
     #define swprintf_s swprintf
     #define sprintf_s snprintf
     // #define swprintf_s(dst, size, src) swprintf(dst, src)

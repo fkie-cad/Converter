@@ -91,8 +91,8 @@ int main(int argc, char** argv)
 
         if ( flags & FLAG_CHAR )
         {
-            s = strcpy_s(label, MAX_DIRTY_LABEL_SIZE, string);
-            if ( s != 0 )
+            s = snprintf(label, MAX_DIRTY_LABEL_SIZE, "%s", string);
+            if ( s >= MAX_DIRTY_LABEL_SIZE )
                 goto clean;
             labelSize = strlen(label);
             fixLabel(label, &labelSize, flags);
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
                 {
                     toCharEl(string[i], i,key, keySize, 0);
                 }
-                while ( i-- > 0 );
+                while ( i-- > 1 );
                 if ( string[i] == '\\' )
                     printf("'\\\\' }");
                 else
@@ -132,8 +132,8 @@ int main(int argc, char** argv)
 
         if ( flags & FLAG_WCHAR )
         {
-            s = strcpy_s(label, MAX_DIRTY_LABEL_SIZE, string);
-            if ( s != 0 )
+            s = snprintf(label, MAX_DIRTY_LABEL_SIZE, "%s", string);
+            if ( s >= MAX_DIRTY_LABEL_SIZE )
                 goto clean;
             labelSize = strlen(label);
             fixLabel(label, &labelSize, flags);
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
                 {
                     toWCharEl(string[i], i, key, keySize, 0);
                 }
-                while ( i-- > 0 );
+                while ( i-- > 1 );
                 if ( string[i] == '\\' )
                     printf("L'\\\\' }");
                 else
