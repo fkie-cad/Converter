@@ -8,6 +8,7 @@
 #include "Args.h"
 #include "print.h"
 #include "utils/Converter.h"
+#include "utils/strings.h"
 
 #define FORMAT_NONE    (0x0)
 #define FORMAT_INT8    (0x1)
@@ -17,6 +18,9 @@
 
 #define FORMAT_ALL   (FORMAT_INT8|FORMAT_INT16|FORMAT_INT32|FORMAT_INT64)
 
+#define EXE_NAME "String2Hex"
+#define EXE_VS "1.0.2"
+#define EXE_LC "07.07.2026"
 
 //#define FLAG_VERBOSE    (0x01)
 #define MODE_NONE       (0x00) // 000
@@ -360,6 +364,12 @@ void printIntBlocks(const uint8_t* bytes, size_t n, uint32_t block_size)
     }
 }
 
+void printVersion()
+{
+    printf("Version: %s\n", EXE_VS);
+    printf("Last changed: %s\n", EXE_LC);
+}
+
 void printUsage()
 {
     printf("Usage: String2Hex "
@@ -370,6 +380,8 @@ void printUsage()
 void printHelp()
 {
     printUsage();
+    printf("\n");
+    printVersion();
     printf("\n");
     printf("Options:\n");
     printf("-a: Convert ascii string into hex.\n");
@@ -428,10 +440,20 @@ int parseParams(
             else
             {
                 Data->Size = 0;
-                s = parsePlainBytes(val, &Data->Bytes, &Data->Size, 0xFFFF);
+
+                uint32_t max_size = 6;
+
+                s = stripWhiteSpace(val, (max_size<<1));
                 if ( s != 0 )
                 {
-                    EPrint("parse data bytes failed\n");
+                    EPrint("Hex format invalid or wrong size! (0x%x)\n", s);
+                    break;
+                }
+
+                s = parsePlainBytes(val, &Data->Bytes, &Data->Size, max_size);
+                if ( s != 0 )
+                {
+                    EPrint("parse data bytes failed! (0x%x)\n", s);
                     break;
                 }
             }

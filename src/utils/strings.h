@@ -9,38 +9,47 @@
     ( (__char__) >= 'a' && (__char__) <= 'z' )
 
 
+#define STRIP_WHITE_SPACE_ERROR_STRING_NULL (-1)
+#define STRIP_WHITE_SPACE_ERROR_MAX_SIZE_NULL (-2)
+#define STRIP_WHITE_SPACE_ERROR_MALLOC_FAILED_NULL (-3)
+#define STRIP_WHITE_SPACE_ERROR_TOO_BIG (-4)
 
+//
+// strip white space, tab from string.
+// destructively works on the input string
+//
 int stripWhiteSpace(char* String, uint32_t MaxSize)
 {
     int s = 0;
     char* bufferPtr = NULL;
 
     if ( !String || *String == 0 )
-        return -1; // no string
+        return STRIP_WHITE_SPACE_ERROR_STRING_NULL; // no string
 
     if ( !MaxSize )
-        return -2; // no size
+        return STRIP_WHITE_SPACE_ERROR_MAX_SIZE_NULL; // no size
 
     char* buffer = (char*)malloc(MaxSize + 1);
     if ( !buffer )
-        return -4;
+        return STRIP_WHITE_SPACE_ERROR_MALLOC_FAILED_NULL;
     char* stringPtr = String;
     size_t bufferOffset = 0;
     
     // copy stripped string into buffer
     while ( *stringPtr != 0 )
     {
-        if ( *stringPtr != ' ' && *stringPtr != '\t' )
+        if ( *stringPtr != ' ' && *stringPtr != '\t' && *stringPtr != '-' )
         {
+            if ( bufferOffset >= MaxSize && *stringPtr != 0 )
+            {
+                s = STRIP_WHITE_SPACE_ERROR_TOO_BIG; // binary to big
+                goto clean;
+            }
+
             buffer[bufferOffset] = *stringPtr;
             bufferOffset++;
         }
         stringPtr++;
-        if ( bufferOffset >= MaxSize && *stringPtr != 0 )
-        {
-            s = -3; // binary to big
-            goto clean;
-        }
     }
     buffer[min(bufferOffset,MaxSize)] = 0;
     

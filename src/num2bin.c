@@ -20,8 +20,8 @@
 
 
 #define EXE_NAME "Num2Bin"
-#define EXE_VS "1.0.8"
-#define EXE_LC "01.06.2026"
+#define EXE_VS "1.0.9"
+#define EXE_LC "07.07.2026"
 
 
 #define WIDTH_INT8    (0x8)
@@ -629,7 +629,7 @@ int checkParams(
             s = stripWhiteSpace(Params->BinaryValue, 0x40);
             if ( s != 0 )
             {
-                if ( s != -3 ) {
+                if ( s != STRIP_WHITE_SPACE_ERROR_TOO_BIG ) {
                     EPrint("Binary value too small or too big!\n"); }
                 else {
                     EPrint("Binary format invalid!\n"); }
