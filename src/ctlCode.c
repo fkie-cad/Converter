@@ -15,8 +15,8 @@
 #include "utils/strings.h"
  
 #define EXE_NAME "CtlCode"
-#define EXE_VS "1.0.4"
-#define EXE_LC "01.06.2026"
+#define EXE_VS "1.0.5"
+#define EXE_LC "10.08.2026"
     
 #define ACCESS_FROM_CTL_CODE(ioctl)          (((uint32_t)((ioctl) & 0xC000)) >> 14)
 #define FUNCTION_FROM_CTL_CODE(ioctl)        (((uint32_t)((ioctl) & 0x3FFC)) >> 2)
@@ -30,19 +30,25 @@ uint32_t methodStringToInt(_In_ char* Method);
 uint32_t accessStringToInt(_In_ char* Access);
 
 
+void printVersion();
+void printUsage();
+void printHelp();
+
+
 
 int __cdecl main(int argc, char** argv)
 {
+    int s = 0;
     char accessBuffer[0x40];
     uint32_t accessBufferSize = 0x40;
 
     if ( argc < 2 )
     {
-        printf("Usage: %s <DeviceType> <Function> <Method> <Access> | <ioctl>\n", argv[0]);
-        return -1;
+        printUsage();
+        return 1;
     }
     
-    if ( argc >= 5 )
+    if ( argc == 5 )
     {
 
         uint32_t deviceType = 0;
@@ -74,7 +80,11 @@ int __cdecl main(int argc, char** argv)
         printf("\n");
         printf("ioctl: 0x%x\n", ioctl);
     }
-    else
+    else if ( argc == 2 && ( argv[1][1] == 'h' || argv[1][1] == '?' ) && argv[1][2] == '\0' )
+    {
+        printHelp();
+    }
+    else if ( argc == 2 )
     {
         uint32_t ioctl = strtoul(argv[1], NULL, 0x10);
      
@@ -93,8 +103,13 @@ int __cdecl main(int argc, char** argv)
         printf("method: 0x%x (%s)\n", method, getMethodString(method));
         printf("access: 0x%x (%s)\n", access, getAccessString(access, accessBuffer, accessBufferSize));
     }
+    else
+    {
+        EPrint("Invalid argument count given!\n");
+        s = 2;
+    }
     
-    return 0;
+    return s;
 }
 
 char* getDeviceTypeString(_In_ DEVICE_TYPE DeviceType)
@@ -400,4 +415,28 @@ uint32_t accessStringToInt(_In_ char* Access)
         return access;
     else
         return (uint32_t)-1;
+}
+
+
+
+void printVersion()
+{
+    printf("Version: %s\n", EXE_VS);
+    printf("Last changed: %s\n", EXE_LC);
+}
+
+void printUsage()
+{
+    printf("Usage: %s <DeviceType> <Function> <Method> <Access> | <ioctl>\n", EXE_NAME);
+}
+
+void printHelp()
+{
+    printUsage();
+    printf("\n");
+    printVersion();
+    printf("\n");
+    printf("Options:\n");
+    printf("Convert <DeviceType> <Function> <Method> <Access> to an ioctl code.\n");
+    printf("Convert an <ioctl> code to the corresponding DeviceType, Function, Method, Access.\n");
 }

@@ -30,8 +30,8 @@ Converts a given ioctl code into its parts (DeviceType, Function, Method, Access
   or the parts into an ioctl code.
 
 ### version
-1.0.4  
-Last changed: 01.06.2026  
+1.0.5  
+Last changed: 10.08.2026  
 
 ### build
 ```bash
